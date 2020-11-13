@@ -1,0 +1,16 @@
+CreateCollection({ name: 'users'});
+CreateIndex({
+  name: 'users_by_email',
+  source: Collection('users'),
+  terms: [{ field: ['data', 'email'], transform: 'casefold' }],
+  unique: true
+});
+
+CreateCollection({ name: 'login_requests'} );
+CreateIndex({
+  name: 'login_requests_by_token',
+  source: Collection('login_requests'),
+  terms: [{ field: ['data', 'token'] }],
+  unique: true
+});
+
