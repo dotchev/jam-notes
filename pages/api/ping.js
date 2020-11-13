@@ -10,7 +10,7 @@ export default async function (req, res) {
   console.log('query:', req.query)
   console.log('cookies:', req.cookies)
   console.log('body:', req.body)
-  console.log('env:', process.env)
+  req.query.env && console.log('env:', process.env)
   console.log('node version:', process.version)
   console.log('OS:', {
     freemem: os.freemem(),
