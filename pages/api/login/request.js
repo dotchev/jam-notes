@@ -1,7 +1,6 @@
 import crypto from 'crypto'
 import faunadb from 'faunadb'
 const q = faunadb.query
-
 import { faunaOptions } from '../../../lib/fauna'
 
 const emailPattern = /\S{1,64}@\S{4,253}/
