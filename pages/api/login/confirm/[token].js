@@ -7,23 +7,35 @@ import { faunaOptions } from '../../../../lib/fauna'
 const sessionSeconds = 6 * 30 * 24 * 60 * 60
 
 export default async function (req, res) {
-  console.log('env:', process.env);
   console.log(req.method, req.url)
   console.log('query:', req.query)
-  const token = req.query.token
+  const loginToken = req.query.token
 
   const client = new faunadb.Client(faunaOptions())
   let r = await client.query(q.Map(
-    q.Paginate(q.Match(q.Index('login_requests_by_token'), token)),
+    q.Paginate(q.Match(q.Index('login_request_by_token'), loginToken)),
     x => q.Get(x)))
   console.log('match login token result:', r)
   if (r.data.length == 0) {
     res.status(404).send('Login token not found')
     return
   }
+  const loginRequest = r.data[0]
 
-  const sessionId = crypto.randomBytes(32).toString('hex')
-  let sessionCookie = `session=${sessionId}; Path=/; Max-Age=${sessionSeconds}; SameSite=Strict; HttpOnly`
+  const sessionToken = crypto.randomBytes(32).toString('hex')
+  r = await client.query(q.Create(q.Collection('sessions'), {
+    data: {
+      token: sessionToken,
+      user_id: loginRequest.user_id
+    },
+    ttl: q.TimeAdd(q.Now(), 180, 'days')
+  }))
+  console.log('create session result:', r)
+
+  r = await client.query(q.Delete(loginRequest.ref))
+  console.log('delete login request result:', r)
+
+  let sessionCookie = `session=${sessionToken}; Path=/; Max-Age=${sessionSeconds}; SameSite=Strict; HttpOnly`
   if (!/^localhost\b/.test(req.headers.host))
     sessionCookie += '; Secure'
   res.setHeader('Set-Cookie', sessionCookie)

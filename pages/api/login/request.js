@@ -18,7 +18,7 @@ export default async function (req, res) {
 
   const client = new faunadb.Client(faunaOptions())
   let r = await client.query(q.Paginate(q.Match(
-    q.Index('users_by_email'), email)))
+    q.Index('user_by_email'), email)))
   console.log('match user result:', r)
   let userRef
   if (r.data.length > 0) {
@@ -43,7 +43,7 @@ export default async function (req, res) {
       token,
       user_id: userRef.id
     },
-    ttl: q.TimeAdd(q.Time('now'), 1, 'hour')
+    ttl: q.TimeAdd(q.Now(), 1, 'hour')
   }))
   console.log('create login request result:', r);
 

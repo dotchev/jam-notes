@@ -1,15 +1,29 @@
 CreateCollection({ name: 'users'});
 CreateIndex({
-  name: 'users_by_email',
+  name: 'user_by_email',
   source: Collection('users'),
   terms: [{ field: ['data', 'email'], transform: 'casefold' }],
   unique: true
 });
 
-CreateCollection({ name: 'login_requests'} );
+CreateCollection({
+  name: 'login_requests',
+  ttl_days: 1
+});
 CreateIndex({
-  name: 'login_requests_by_token',
+  name: 'login_request_by_token',
   source: Collection('login_requests'),
+  terms: [{ field: ['data', 'token'] }],
+  unique: true
+});
+
+CreateCollection({
+  name: 'sessions',
+  ttl_days: 180
+});
+CreateIndex({
+  name: 'session_by_token',
+  source: Collection('sessions'),
   terms: [{ field: ['data', 'token'] }],
   unique: true
 });
