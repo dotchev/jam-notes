@@ -1,6 +1,5 @@
 import crypto from 'crypto'
 import faunadb from 'faunadb'
-import { get } from 'http'
 const q = faunadb.query
 import { faunaOptions } from '../../../../lib/fauna'
 
@@ -26,7 +25,7 @@ export default async function (req, res) {
   r = await client.query(q.Create(q.Collection('sessions'), {
     data: {
       token: sessionToken,
-      user_id: loginRequest.user_id
+      user_id: loginRequest.data.user_id
     },
     ttl: q.TimeAdd(q.Now(), 180, 'days')
   }))
@@ -39,5 +38,5 @@ export default async function (req, res) {
   if (!/^localhost\b/.test(req.headers.host))
     sessionCookie += '; Secure'
   res.setHeader('Set-Cookie', sessionCookie)
-  res.redirect('/')
+  res.redirect('/notes')
 }

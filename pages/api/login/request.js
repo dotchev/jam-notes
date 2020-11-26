@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import faunadb from 'faunadb'
 const q = faunadb.query
 import { faunaOptions } from '../../../lib/fauna'
+import { buildUrl } from '../../../lib/url'
 
 const emailPattern = /\S{1,64}@\S{4,253}/
 
@@ -46,6 +47,9 @@ export default async function (req, res) {
     ttl: q.TimeAdd(q.Now(), 1, 'hour')
   }))
   console.log('create login request result:', r);
+
+  const confirmUrl = buildUrl(req, '/api/login/confirm/' + token)
+  console.log(`Confirm login at ${confirmUrl}`);
 
   res.status(204).end()
 }
