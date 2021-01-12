@@ -13,7 +13,9 @@ export default async function (req, res) {
 
   const email = req.body.email
   if (!emailPattern.test(email)) {
-    res.status(400).send(`Invalid email address ${email}`)
+    let msg = `Invalid email address ${email}`
+    console.error(msg)
+    res.status(400).send(msg)
     return
   }
 
